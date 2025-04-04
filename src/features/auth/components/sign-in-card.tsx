@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { SignInFlow } from "../types";
+import { TriangleAlert } from 'lucide-react';
 import { useState } from "react";
 interface SignInCardProps{
     setState: (state: SignInFlow) => void;
@@ -20,10 +21,27 @@ interface SignInCardProps{
 const SignInCard = ({ setState }: SignInCardProps) => {
   const {signIn} =useAuthActions()
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("")
+ 
   const handleProvider = (value:"github" |"google") => {
     signIn(value);
+  }
+  console.log("error",error);
+  
+  const handleSinginWithPassword = (e:React.FormEvent<HTMLFormElement>) =>{
+    e.preventDefault();
+    setPending(true);
+    signIn("password", { email, password, flow: "signIn" })
+      .catch(() => {
+      setError("Invalid Email or Password")
+      }).finally(() => {
+        setPending(false);
+        setEmail("");
+        setPassword("");
+        
+    })
   }
   return (
     <Card className="w-full h-full p-8">
@@ -33,9 +51,15 @@ const SignInCard = ({ setState }: SignInCardProps) => {
           Use your email or anoter service to continue
         </CardDescription>
       </CardHeader>
+      {!!error && (
+        <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+          <TriangleAlert size={25} />
+          <p>{error}</p>
+        </div>
+      )}
 
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form onSubmit={handleSinginWithPassword} className="space-y-2.5">
           <Input
             type="email"
             value={email}
@@ -52,14 +76,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             disabled={false}
             required
           />
-          <Input
-            type="text"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm Password"
-            disabled={false}
-            required
-          />
+         
           <Button
             type="submit"
             disabled={false}
@@ -84,7 +101,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
             className="w-full relative cursor-pointer"
             size="lg"
             variant="outline"
-            onClick={() =>handleProvider("github")}
+            onClick={() => handleProvider("github")}
           >
             <FaGithub className="size-5 absolute top-2.5 left-2.5" />
             Continue with Github
