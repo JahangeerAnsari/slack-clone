@@ -5,8 +5,7 @@ import { DataModel } from "./_generated/dataModel";
 // by using custom password
 const customPassword = Password<DataModel>({
   profile(params) {
-    console.log("params ==========>",params);
-    
+     
     return {
       email: params.email as string,
       name: params.name as string,
