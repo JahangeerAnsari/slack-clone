@@ -46,7 +46,7 @@ const CreateWorkspacesModal = () => {
         </DialogHeader>
         <form onSubmit={handleSubmitWorkspaceForm} className="space-y-4">
           <Input
-            disabled={false}
+            disabled={isPending}
             value={name}
             autoFocus
             required
@@ -55,7 +55,7 @@ const CreateWorkspacesModal = () => {
             onChange={(e) => setName(e.target.value)}
           />
           <div className="flex justify-end">
-            <Button disabled={false}>Create</Button>
+            <Button disabled={isPending}>Create</Button>
           </div>
         </form>
       </DialogContent>
