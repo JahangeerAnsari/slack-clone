@@ -28,7 +28,7 @@ const SignInCard = ({ setState }: SignInCardProps) => {
   const handleProvider = (value:"github" |"google") => {
     signIn(value);
   }
-  console.log("error",error);
+ 
   
   const handleSinginWithPassword = (e:React.FormEvent<HTMLFormElement>) =>{
     e.preventDefault();

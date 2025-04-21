@@ -1,1 +1,1 @@
-export  type ModalTypes = "createWorkspaces" | "inviteServer" | "editServer";
+export  type ModalTypes = "createWorkspaces" | "preferences" | "editWorkspace";
