@@ -29,6 +29,11 @@ export const create = mutation({
       workspaceId,
       role:"admin"
      })
+    //  whenever we create an workspace by default we create channel
+    await ctx.db.insert("channels",{
+      name:"general",
+      workspaceId
+    })
     // const workspace = await ctx.db.get(workspaceId);
     // we can get the details of workspace
     return workspaceId;

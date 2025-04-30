@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { channel } from "diagnostics_channel";
 const schema = defineSchema({
   ...authTables,
   // Your other tables...
@@ -17,7 +18,12 @@ const schema = defineSchema({
   // to fetched easly 
   .index("by_user_id",["userId"])
   .index("by_workspace_id",["workspaceId"])
-  .index("by_workspace_id_user_id",["workspaceId","userId"])
+  .index("by_workspace_id_user_id",["workspaceId","userId"]),
+  channels:defineTable({
+    name:v.string(),
+    workspaceId: v.id("workspaces")
+  })
+  .index("by_workspace_id",["workspaceId"])
 });
 
 export default schema

@@ -17,6 +17,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useConfirm } from "@/hooks/use-confirmation";
 interface PreferrencesModalProps {
   initialValue: string;
 
@@ -27,16 +28,17 @@ export const PreferrencesModal = ({ initialValue }: PreferrencesModalProps) => {
   const [value, setValue] = useState(initialValue);
   const { isOpen, onClose, type,onOpen } = useStoreModal();
   const isModalOpen = isOpen && type === "preferences";
-
-  
-  const {mutate:workspaceDelete , isPending:isDeleteWorkspace} = useDeleteWorkspace()
+  const {mutate:workspaceDelete , isPending:isDeleteWorkspace} = useDeleteWorkspace();
+  const [ConfirmDialog,confirm] =useConfirm("Are you Sure?", "This action is irreversible")
   const handleClosePreferenceModal = () => {
     onClose();
   };
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-  const handleDeleteWorkspace = () =>{
+  const handleDeleteWorkspace = async () =>{
+    const okay = await confirm()
+     if(!okay) return
     workspaceDelete({
      id:workspaceId
     },{
@@ -52,6 +54,7 @@ export const PreferrencesModal = ({ initialValue }: PreferrencesModalProps) => {
   }
   return (
     <>
+    <ConfirmDialog/>
     <EditWorkspacesModal value={value}/>
     <Dialog open={isModalOpen} onOpenChange={handleClosePreferenceModal}>
       <DialogContent className="p-0 bg-gray-50 overflow-hidden ">

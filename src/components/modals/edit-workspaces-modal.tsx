@@ -13,10 +13,10 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUpdateWorkspace } from "@/features/workspaces/api/use-update-workspace";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
+
 
 interface EditWorkspacesModalProps{
   value :string;
@@ -30,7 +30,6 @@ const EditWorkspacesModal = ({ value}:EditWorkspacesModalProps) => {
   const isModalOpen = isOpen && type === "editWorkspace";
   const {mutate:workspaceUpdate, isPending:isUpdatingWorkspace} = useUpdateWorkspace();
   
-  
   const handleCloseEditModal = () => {
     onClose();
     onOpen("preferences")
@@ -41,6 +40,7 @@ const EditWorkspacesModal = ({ value}:EditWorkspacesModalProps) => {
     onOpen("preferences")
   };
   const handleEditWorkspaceForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    const okay = await
     e.preventDefault();
    await workspaceUpdate({
       id:workspaceId,
