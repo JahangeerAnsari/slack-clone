@@ -8,19 +8,17 @@ import { useGetChannels } from "@/features/channels/api/use-get-channels";
 import { WorkspaceSection } from "./workspace-section";
 import { useGetMembers } from "@/features/members/api/use-get-members";
 import { UserDetail } from "./user-detail";
+import { useStoreModal } from "@/hooks/use-modal-store";
 
 export const WorkspaceSidebar = () => {
+  const { onOpen} = useStoreModal();
   /* find the workspace   */
   const workspaceId = useWorkspaceId();
-  const { data: member, isLoading: isMemberLoading } = useCurrentMember({
-    workspaceId,
-  });
-  const { data: workspace, isLoading: isWorkspaceLoading } = useGetWorkspace({
-    id: workspaceId,
-  });
-   const {data:channels, isLoading:isChannelLoading} = useGetChannels({workspaceId});
-     const {data:members, isLoading:membersLoading} = useGetMembers({workspaceId});
-     console.log("membersData",members);
+  const { data: member, isLoading: isMemberLoading } = useCurrentMember({ workspaceId});
+  const { data: workspace, isLoading: isWorkspaceLoading } = useGetWorkspace({id: workspaceId});
+  const {data:channels, isLoading:isChannelLoading} = useGetChannels({workspaceId});
+  const {data:members, isLoading:membersLoading} = useGetMembers({workspaceId});
+  
      
   if (isMemberLoading || isWorkspaceLoading) {
     return (
@@ -57,7 +55,7 @@ export const WorkspaceSidebar = () => {
       <WorkspaceSection 
          label="Channels"
          hint="New Channels"
-         onNew={() => {}}
+         onNew={member?.role === "admin" ? ()  => onOpen("createChannel"): undefined}
         >
         {channels?.map((item) => (
             <SidebarItem 
@@ -71,7 +69,6 @@ export const WorkspaceSidebar = () => {
         <WorkspaceSection 
          label="Direct Messages"
          hint="New Direct Messages"
-         onNew={() => {}}
         >
             {members?.map((item) => (
           <UserDetail id={item._id} 
