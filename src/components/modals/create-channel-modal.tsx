@@ -32,13 +32,16 @@ const CreateChannelModal = () => {
     const value = e.target.value.replace(/\s+/g, "-").toLowerCase();
     setName(value)
   }
-  const handleSubmitWorkspaceForm = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitWorkspaceForm =  (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     mutate({ name,workspaceId }, {
       // data--< we are returning the id
       onSuccess(id) {
+        // redirect to the created new channel
+        router.push(`/workspace/${workspaceId}/channel/${id}`)
         handleCloseModal();
-        toast.success("New Channel Created!")
+        toast.success("New Channel Created!");
+       
       },
     })
   };
