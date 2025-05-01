@@ -9,6 +9,65 @@ const generateCode = () =>{
   ).join("");
   return code;
 }
+  // join workspace we need workspaceId and the generated code
+  export const join = mutation({
+    args:{
+      joinCode:v.string(),
+      workspaceId:v.id("workspaces")
+    },
+    handler : async (ctx, args) =>{
+      const userId = await auth.getUserId(ctx);
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      const workspace = await ctx.db.get(args.workspaceId);
+      if(!workspace){
+        throw new Error("Workspace not found")
+      }
+
+      if(workspace.joinCode !== args.joinCode){
+        throw new Error("Invalid join Code")
+      };
+// we fint the person
+  const existingMember = await ctx.db.query("members")
+  .withIndex("by_workspace_id_user_id",(q) => 
+    q.eq("workspaceId",args.workspaceId).eq("userId",userId),
+    ).unique();
+     if(existingMember){
+      throw new Error("Already a member of this workspace")
+     }
+    //  we add new member with this workspace
+    await ctx.db.insert("members",{
+      userId,
+      workspaceId:workspace._id,
+      role:"member"
+    })
+return workspace._id
+    }
+  })
+  // GET NEW JOINCODE
+export const newJoinCode = mutation({
+  args:{
+    workspaceId:v.id("workspaces")
+  },
+  handler :async(ctx, args) =>{
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    const member = await ctx.db.query("members")
+      .withIndex("by_workspace_id_user_id",(q) => 
+      q.eq("workspaceId",args.workspaceId).eq("userId",userId),
+      ).unique();
+
+      if(!member || member.role !=="admin"){
+        throw new Error("Unauthorized")
+      }
+   const joinCode = generateCode();
+   await ctx.db.patch(args.workspaceId,{joinCode});
+   return args.workspaceId
+  }
+})
 export const create = mutation({
   args: {
     name: v.string(),
@@ -41,6 +100,8 @@ export const create = mutation({
   },
   
   });
+  // GET_USERBY_ID
+  
 export const get = query({
   args: {},
   handler: async (ctx) => {
@@ -61,6 +122,26 @@ export const get = query({
     return workspaces;
   },
 });
+export const getInfoById = query({
+  args: { id: v.id("workspaces") },
+  handler: async(ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    const member = await ctx.db
+      .query("members")
+      .withIndex("by_workspace_id_user_id", (q) =>
+        q.eq("workspaceId", args.id).eq("userId", userId)
+      )
+      .unique();
+    const workspace = await ctx.db.get(args.id);
+    return {
+      name: workspace?.name,
+      isMember: !!member
+    }
+  }
+})
 export const getWorkspaceById = query({
   args: {id:v.id('workspaces')},
   handler: async (ctx,args) => {

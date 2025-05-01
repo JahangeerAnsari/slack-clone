@@ -11,6 +11,7 @@ import { ChevronDown, FilterIcon, ListFilter, SquarePen } from "lucide-react";
 import Hint from "@/components/hint";
 import { PreferrencesModal } from "@/components/modals/preferences-modal";
 import { useStoreModal } from "@/hooks/use-modal-store";
+import InvitePeopleModal from "@/components/modals/invite-people-modal";
 
 interface WorkspaceSidebarHeaderProps {
   workspace: Doc<"workspaces">;
@@ -25,6 +26,7 @@ export const WorkspaceSidebarHeader = ({
  
   return (
     <>
+    <InvitePeopleModal name={workspace.name} joinCode={workspace.joinCode}/>
       <PreferrencesModal initialValue={workspace?.name}/>
       <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
         <DropdownMenu>
@@ -57,7 +59,7 @@ export const WorkspaceSidebarHeader = ({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer py-2"
-                  onClick={() => {}}
+                  onClick={() => onOpen("invitePeople",)}
                 >
                   Invite people to {workspace.name}
                 </DropdownMenuItem>
