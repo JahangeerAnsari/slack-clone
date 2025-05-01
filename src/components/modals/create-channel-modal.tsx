@@ -43,6 +43,9 @@ const CreateChannelModal = () => {
         toast.success("New Channel Created!");
        
       },
+      onError:() =>{
+        toast.error("Failed to create channel")
+      }
     })
   };
   

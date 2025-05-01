@@ -1,5 +1,6 @@
 "use client";
 import { useGetChannels } from "@/features/channels/api/use-get-channels";
+import { useCurrentMember } from "@/features/members/api/use-current-member";
 /*
 i want to redicrect to to  the workspace/id/channel/id page
 */
@@ -17,18 +18,21 @@ const WorkspaceIdPage = () => {
 const isModalOpen = isOpen && type === "createChannel";
 const {data:workspace, isLoading:workspaceLoading} = useGetWorkspace({id:workspaceId});
 const {data:channels, isLoading:channelsLoading} = useGetChannels({workspaceId});
+const {data:member, isLoading:memberLoading} = useCurrentMember({workspaceId})
+console.log("channels===>",channels);
 
 // get the first channel at index 0
 const channelId = useMemo(() => channels?.[0]?._id,[channels]);
+const isAdmin = useMemo(() => member?.role ==="admin", [member?.role])
  // if there is channel for workspace send the 
    useEffect(() =>{
-   if(workspaceLoading || channelsLoading || !workspace) return;
+   if(workspaceLoading || channelsLoading || !workspace || memberLoading || !member ) return;
      if(channelId){
       router.push(`/workspace/${workspaceId}/channel/${channelId}`)
-     }else if(!isModalOpen){
+     }else if(!isModalOpen && isAdmin){
       onOpen("createChannel")
      }
-   },[channelId,workspaceLoading,channelsLoading,workspace,isModalOpen, onOpen])
+   },[isAdmin,memberLoading, member, channelId,workspaceLoading,channelsLoading,workspace,isModalOpen, onOpen])
   if(workspaceLoading || channelsLoading){
     return (
       <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
@@ -48,7 +52,16 @@ const channelId = useMemo(() => channels?.[0]?._id,[channels]);
     )
   }
 
-    return null;
+    
+      return (
+        <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
+        <TriangleAlert className="size-6  text-muted-foreground"/>
+        <span className="text-sm text-muted-foreground">
+          No channel found
+        </span>
+        </div>
+      )
+    
 }; 
  
 export default WorkspaceIdPage;
