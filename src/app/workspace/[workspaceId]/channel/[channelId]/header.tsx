@@ -1,3 +1,4 @@
+import EditChannelModal from "@/components/modals/edit-channel-modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -5,16 +6,48 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDeleteChannel } from "@/features/channels/api/use-delete-channel";
+import { useChannelId } from "@/hooks/use-channel-id";
+import { useConfirm } from "@/hooks/use-confirmation";
+import { useStoreModal } from "@/hooks/use-modal-store";
+import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Trash, TrashIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { toast } from "sonner";
 
 interface ChannelHeaderProps {
   name: string;
 }
 const ChannelHeader = ({ name }: ChannelHeaderProps) => {
-  return (
-    <div className="bg-white border-b h-[49px] flex items-center px-4 overflow-hidden">
+  const router = useRouter()
+    const channelId = useChannelId();
+    const workspaceId = useWorkspaceId()
+     const { onOpen} = useStoreModal();
+     const {mutate:deleteChannel, isPending:deletePending} =useDeleteChannel();
+     const [ConfirmDialog,confirm] = useConfirm(
+        "Delete this channel?",
+        "You are about to delete this channel."
+       )
+       const handleDeleteChannel =async () =>{
+         const okay = await confirm();
+         if(!okay) return ;
+         await deleteChannel({id:channelId},{
+          onSuccess:() =>{
+            toast.success('Channel Deleted');
+            router.push(`/workspace/${workspaceId}`)
+
+          },
+          onError:() =>{
+            toast.error("Failed to delete the channel")
+          }
+         })
+       }
+  return <>
+  <ConfirmDialog/>
+  <EditChannelModal name={name}/>
+  <div className="bg-white border-b h-[49px] flex items-center px-4 overflow-hidden">
       <Dialog>
         <DialogTrigger asChild>
           <Button
@@ -34,11 +67,13 @@ const ChannelHeader = ({ name }: ChannelHeaderProps) => {
             <div className="px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50">
                 <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold">Channel Name</p>
-                <p className="text-sm text-[#1264a3] hover:underline font-bold">Edit</p>
+                <p className="text-sm text-[#1264a3] hover:underline font-bold" 
+                onClick={() =>onOpen("editChannel")}
+                >Edit</p>
                 </div>
                 <p className="text-sm"># {name}</p>
             </div>
-            <button className="flex items-center gap-x-2 px-5 py-4 bg-white rounded-lg cursor-pointer boader hover:bg-rose-300 hover:text-white">
+            <button onClick={handleDeleteChannel} disabled={deletePending} className="flex items-center gap-x-2 px-5 py-4 bg-white rounded-lg cursor-pointer boader hover:bg-rose-300 hover:text-white">
             <TrashIcon className="size-4"/>
             <p className="text-sm font-semibold">Delete channel</p>
             </button>
@@ -46,7 +81,7 @@ const ChannelHeader = ({ name }: ChannelHeaderProps) => {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  </>;
 };
 
 export default ChannelHeader;

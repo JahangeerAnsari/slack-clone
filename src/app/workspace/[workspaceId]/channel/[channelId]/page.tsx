@@ -10,7 +10,7 @@ const ChannelIdPage = () => {
   const { data: channel, isLoading: channelLoading } = useGetChannelById({
     id: channelId,
   });
-  console.log("====>channel", channel);
+  
   if (channelLoading) {
     return (
       <div className="h-full flex-1  flex flex-col items-center justify-center  gap-y-2">

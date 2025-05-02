@@ -1,1 +1,6 @@
-export  type ModalTypes = "createWorkspaces" | "preferences" | "editWorkspace" | "createChannel" | "invitePeople";
+export type ModalTypes =
+  | "createWorkspaces"
+  | "preferences"
+  | "editWorkspace"
+  | "createChannel"
+  | "invitePeople" | "editChannel";
