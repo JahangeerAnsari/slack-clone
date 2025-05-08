@@ -59,6 +59,7 @@ const CreateChannelModal = () => {
           <Input
             disabled={isPending}
             value={name}
+            type="text"
             autoFocus
             required
             minLength={3}
