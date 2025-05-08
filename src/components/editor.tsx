@@ -78,7 +78,17 @@ const Editor = ({
             enter: {
               key: "Enter",
               handler: () => {
-                // we war submit form at enter key
+               const text = quill.getText();
+               const addedImage = imageElementRef.current?.files?.[0] || null;
+               const isEmpty = !addedImage && text.replace(/<(.|\n)*?>/g, "").trim().length === 0
+               if(isEmpty)
+                return ;
+
+               const body = JSON.stringify(quill.getContents());
+               submitRef.current?.({
+                body,
+                image:addedImage
+               })
               },
             },
             shift_enter: {
@@ -125,7 +135,7 @@ const Editor = ({
       toolbarElement.classList.toggle("hidden");
     }
   };
-  const isEmpty = text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+  const isEmpty = !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
   console.log("isEmpty===>", { isEmpty, text });
   const onEmojiSelect = (emoji: any) => {
     setChosenEmoji(emoji);
@@ -210,13 +220,16 @@ const Editor = ({
           )}
           {variant === "update" && (
             <div className="ml-auto flex items-center gap-x-2">
-              <Button size="sm" variant="outline" onClick={() => {}}>
+              <Button size="sm" variant="outline" onClick={onCancel} disabled={disabled}>
                 Cancel
               </Button>
               <Button
                 size="sm"
                 disabled={disabled || isEmpty}
-                onClick={() => {}}
+                onClick={() => onSubmit({
+                  body:JSON.stringify(quillRef.current?.getContents()),
+                  image
+                })}
                 className="bg-[#007a5a] hover:bg-[#007a5a]/80 text-white"
               >
                 Save
@@ -227,7 +240,10 @@ const Editor = ({
           {variant === "create" && (
             <Button
               disabled={disabled}
-              onClick={() => {}}
+              onClick={() => onSubmit({
+                body:JSON.stringify(quillRef.current?.getContents()),
+                image
+              })}
               className={cn(
                 "ml-auto",
                 isEmpty
