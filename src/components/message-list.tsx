@@ -94,6 +94,11 @@ export const MessageList = ({
               />
             );
           })}
+          {/* <div>
+            <button onClick={loadMore}>
+              Load More
+            </button>
+          </div> */}
         </div>
       ))}
       {variant === "channel" && channelName && channelCreationTime && (

@@ -62,7 +62,7 @@ return await ctx.db.query("members")
 
 //  get message  api
 
-
+// update
 export const update = mutation({
   args:{
     id:v.id("messages"),
@@ -87,6 +87,30 @@ export const update = mutation({
       body:args.body,
       updatedAt:Date.now()
     })
+    return args.id
+  }
+})
+
+export const deleteMessage = mutation({
+  args:{
+    id:v.id("messages"),
+  },
+  handler: async( ctx,args) =>{
+ const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+   const message = await ctx.db.get(args.id);
+    if(!message){
+      throw new Error("Message not found")
+    }
+    const member = await getMember(ctx,message.workspaceId,userId);
+     if(!member || member._id !== message.memberId){
+      throw new Error("Member not found")
+     }
+    //  finally update the message
+
+    await ctx.db.delete(args.id)
     return args.id
   }
 })
